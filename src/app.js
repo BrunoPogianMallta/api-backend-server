@@ -15,13 +15,16 @@ const corsOptions = {
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200 
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
-
-
 app.options('*', cors(corsOptions));
-
 app.use(express.json());
 
+// Importa as rotas do auth (caminho relativo dentro de src)
+const authRoutes = require('./routes/auth.routes');
+
+app.use('/api/auth', authRoutes);
+
+module.exports = app;
