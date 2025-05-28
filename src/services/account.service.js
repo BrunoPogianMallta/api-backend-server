@@ -1,25 +1,46 @@
-// services/account.service.js
-const pool = require('../config/db');
-
-async function createAccount({ username, shaPassHash, email, verifier, salt }) {
+async function createAccount({ username, salt, verifier, email, reg_mail, locked = 0, expansion = 2 }) {
   const sql = `
-    INSERT INTO account (username, sha_pass_hash, email, v, s)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO account (username, salt, v, email, reg_mail, joindate, locked, expansion)
+    VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)
   `;
-  const [result] = await pool.execute(sql, [username, shaPassHash, email, verifier, salt]);
+
+  const [result] = await pool.execute(sql, [
+    username,
+    salt,
+    verifier,
+    email,
+    reg_mail,
+    locked,
+    expansion
+  ]);
+
   return result;
 }
 
-async function getAccountByCredentials(username, shaPassHash) {
+async function updatePassword(username, { verifier, salt }) {
   const sql = `
-    SELECT id, username, email FROM account
-    WHERE username = ? AND sha_pass_hash = ?
+    UPDATE account
+    SET v = ?, salt = ?
+    WHERE username = ?
   `;
-  const [rows] = await pool.execute(sql, [username, shaPassHash]);
+
+  const [result] = await pool.execute(sql, [
+    verifier,
+    salt,
+    username
+  ]);
+
+  return result;
+}
+
+async function getAccountByUsername(username) {
+  const sql = `SELECT id, username FROM account WHERE username = ?`;
+  const [rows] = await pool.execute(sql, [username]);
   return rows[0];
 }
 
 module.exports = {
   createAccount,
-  getAccountByCredentials
+  updatePassword,
+  getAccountByUsername
 };
