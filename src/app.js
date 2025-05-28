@@ -1,13 +1,16 @@
+require('dotenv').config();  
+
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
+const authRoutes = require('./routes/auth.routes');
 
-const app = express();
+const app = express(); 
 
-const allowedOrigins = process.env.CORS_ORIGINS.split(',');
+const allowedOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [];
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Permite requests sem origin (como curl/postman) ou origem na lista liberada
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -20,11 +23,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
+
 app.use(express.json());
 
-// Importa as rotas do auth (caminho relativo dentro de src)
-const authRoutes = require('./routes/auth.routes');
-
+// Rotas
 app.use('/api/auth', authRoutes);
 
 module.exports = app;
