@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 async function createAccount({ username, salt, verifier, email, reg_mail, locked = 0, expansion = 2 }) {
   const sql = `
-    INSERT INTO account (username, salt, v, email, reg_mail, joindate, locked, expansion)
+    INSERT INTO account (username, salt, verifier, email, reg_mail, joindate, locked, expansion)
     VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)
   `;
 
