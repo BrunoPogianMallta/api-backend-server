@@ -1,20 +1,18 @@
-require('dotenv').config();
 const express = require('express');
+const corsMiddleware = require('./middlewares/corsMiddleware');
 const helmet = require('helmet');
-const xss = require('xss-clean');
-
-const corsMiddleware = require('./middlewares/cors.middleware');
-const rateLimiter = require('./middlewares/rateLimiter.middleware');
+const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet);
 app.use(corsMiddleware);
-app.use(rateLimiter);
+app.options('*', corsMiddleware);
+
+app.use(rateLimitMiddleware);
 
 app.use(express.json());
-app.use(xss());
 
 app.use('/api/auth', authRoutes);
 
