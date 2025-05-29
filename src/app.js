@@ -6,7 +6,7 @@ const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
-app.use(helmet);
+app.use(helmet());
 app.use(corsMiddleware);
 app.options('*', corsMiddleware);
 
