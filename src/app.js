@@ -1,32 +1,21 @@
-require('dotenv').config();  
-
+require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+
+const corsMiddleware = require('./middlewares/cors.middleware');
+const rateLimiter = require('./middlewares/rateLimiter.middleware');
 const authRoutes = require('./routes/auth.routes');
 
-const app = express(); 
+const app = express();
 
-const allowedOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Permite requests sem origin (como curl/postman) ou origem na lista liberada
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.use(helmet());
+app.use(corsMiddleware);
+app.use(rateLimiter);
 
 app.use(express.json());
+app.use(xss());
 
-// Rotas
 app.use('/api/auth', authRoutes);
 
 module.exports = app;
