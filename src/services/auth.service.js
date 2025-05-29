@@ -17,17 +17,17 @@ async function register(username, password, email) {
   });
 }
 
-async function login(username, password) {
-  // ⚠️ Você NÃO faz a verificação manual aqui. O login SRP será feito pelo cliente WoW via SRP-6 protocolo
+async function login(username, password, remember = false) {
   const normalizedUsername = username.toUpperCase();
 
   const user = await accountService.getAccountByUsername(normalizedUsername);
   if (!user) throw new Error('Conta não encontrada');
 
-  // ⚠️ Aqui você poderia retornar os dados do salt/verifier para testes internos, mas NUNCA expose isso para o cliente final
+  // Define o tempo de expiração com base no remember
+  const expiresIn = remember ? '7d' : '1h';
 
   const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {
-    expiresIn: '1h'
+    expiresIn
   });
 
   return { user, token };

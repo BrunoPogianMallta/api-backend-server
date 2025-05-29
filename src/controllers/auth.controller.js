@@ -18,19 +18,31 @@ async function register(req, res) {
 
 async function login(req, res) {
   try {
-    const { username, password } = req.body;
+    const { username, password, remember } = req.body;
 
-    console.log('[LOGIN] Tentativa:', username);
-    const { user, token } = await authService.login(username, password);
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: 'Usuário e senha são obrigatórios' });
+    }
 
-    console.log('[LOGIN] Sucesso:', username);
-    return res.status(200).json({ success: true, user, token });
+    console.log('[LOGIN] Tentativa de login:', username);
+
+    const { user, token } = await authService.login(username, password, remember);
+
+    console.log('[LOGIN] Login bem-sucedido para:', username);
+    console.log('[LOGIN] Token gerado:', token);
+
+    return res.status(200).json({
+      success: true,
+      user,
+      token
+    });
 
   } catch (err) {
-    console.error('[LOGIN] Falha:', err.message);
+    console.error('[LOGIN] Erro no login:', err.message);
     return res.status(401).json({ success: false, message: 'Credenciais inválidas' });
   }
 }
+
 
 async function verify(req, res) {
   try {
