@@ -3,6 +3,7 @@ const corsMiddleware = require('./middlewares/cors.middleware');
 const helmet = require('helmet');
 const rateLimitMiddleware = require('./middlewares/rateLimiter.middleware');
 const authRoutes = require('./routes/auth.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.use(rateLimitMiddleware);
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 module.exports = app;

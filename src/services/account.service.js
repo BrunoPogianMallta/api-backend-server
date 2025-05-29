@@ -5,7 +5,6 @@ async function createAccount({ username, salt, verifier, email, reg_mail, locked
     INSERT INTO account (username, salt, verifier, email, reg_mail, joindate, locked, expansion)
     VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)
   `;
-
   const [result] = await pool.execute(sql, [
     username,
     salt,
@@ -15,7 +14,6 @@ async function createAccount({ username, salt, verifier, email, reg_mail, locked
     locked,
     expansion
   ]);
-
   return result;
 }
 
@@ -25,13 +23,11 @@ async function updatePassword(username, { verifier, salt }) {
     SET v = ?, salt = ?
     WHERE username = ?
   `;
-
   const [result] = await pool.execute(sql, [
     verifier,
     salt,
     username
   ]);
-
   return result;
 }
 
@@ -42,16 +38,25 @@ async function getAccountByUsername(username) {
 }
 
 async function getAccountById(id) {
-  const [rows] = await pool.execute('SELECT id,username FROM account WHERE id = ?', [id]);
-  console.log('[DB] getAccountById resultado:', rows);
+  const [rows] = await pool.execute('SELECT id, username FROM account WHERE id = ?', [id]);
   return rows[0];
 }
 
+
+async function getAccountFullById(id) {
+  const sql = `
+    SELECT id, username, vote_points, joindate, totaltime
+    FROM account
+    WHERE id = ?
+  `;
+  const [rows] = await pool.execute(sql, [id]);
+  return rows[0];
+}
 
 module.exports = {
   createAccount,
   updatePassword,
   getAccountByUsername,
-  getAccountById
+  getAccountById,
+  getAccountFullById
 };
-
