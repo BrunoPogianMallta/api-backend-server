@@ -63,4 +63,5 @@ async function verify(req,res) {
 module.exports = {
   register,
   login,
+  verify
 };
