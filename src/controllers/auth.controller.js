@@ -39,6 +39,27 @@ async function login(req, res) {
   }
 }
 
+async function verify(req,res) {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if(!token) {
+      return res.status(401).json({ success: false, message:"Token não fornecido"});
+  }
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const user = await accountService.getAccountById(decoded.id);
+
+  if(!user) {
+    return res.status(401).json({success: false, message: "Usuário não encontrado"});
+  }
+  return res.status(200).json({ success: true, uder:{ id:user.id, username:user.username}});
+} catch (err) {
+  console.error('Erro ao verifficar o token',err.message);
+  return res.status(401).json({ success: false, message:'Token inválido ou expirado'});
+}
+}
+
 module.exports = {
   register,
   login,

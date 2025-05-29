@@ -41,9 +41,14 @@ async function getAccountByUsername(username) {
   return rows[0];
 }
 
+async function getAccountById(id) {
+  const [rows] = await pool.execute('SELECT id,username FROM account WHERE id = ?', [id]);
+}
+
 module.exports = {
   createAccount,
   updatePassword,
-  getAccountByUsername
+  getAccountByUsername,
+  getAccountById
 };
 
