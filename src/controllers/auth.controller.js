@@ -1,4 +1,6 @@
+const jwt = require('jsonwebtoken');
 const authService = require('../services/auth.service');
+const accountService = require('../services/account.service'); // Certifique-se de que está no lugar certo
 
 async function register(req, res) {
   try {
@@ -9,6 +11,7 @@ async function register(req, res) {
     }
 
     await authService.register(username, password, email);
+
     return res.status(201).json({ success: true, message: 'Conta criada com sucesso' });
 
   } catch (err) {
@@ -39,25 +42,26 @@ async function login(req, res) {
   }
 }
 
-async function verify(req,res) {
+async function verify(req, res) {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const user = await accountService.getAccountById(req.user.id);
 
-    if(!token) {
-      return res.status(401).json({ success: false, message:"Token não fornecido"});
-  }
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  const user = await accountService.getAccountById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Usuário não encontrado' });
+    }
 
-  if(!user) {
-    return res.status(401).json({success: false, message: "Usuário não encontrado"});
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username
+      }
+    });
+
+  } catch (err) {
+    console.error('Erro ao verificar o token:', err.message);
+    return res.status(500).json({ success: false, message: 'Erro interno ao verificar token' });
   }
-  return res.status(200).json({ success: true, uder:{ id:user.id, username:user.username}});
-} catch (err) {
-  console.error('Erro ao verifficar o token',err.message);
-  return res.status(401).json({ success: false, message:'Token inválido ou expirado'});
-}
 }
 
 module.exports = {
