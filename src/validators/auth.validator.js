@@ -5,8 +5,11 @@ const registerSchema = Joi.object({
   password: Joi.string().min(6).required(),
   confirmPassword: Joi.any().valid(Joi.ref('password')).required()
     .messages({ 'any.only': 'A confirmação da senha não confere.' }),
-  email: Joi.string().email().required()
+  email: Joi.string().email().required(),
+  terms: Joi.boolean().valid(true).required()
+    .messages({ 'any.only': 'Você deve aceitar os termos para continuar.' })
 });
+
 
 
 const loginSchema = Joi.object({
