@@ -12,4 +12,17 @@ async function getMainCharacterByAccountId(accountId) {
   return rows[0];
 }
 
-module.exports = { getMainCharacterByAccountId };
+async function getAllCharactersByAccountId( accountId) {
+    const sql = `SELECT guid, name, race, class, level, totaltime,gender
+    FROM characters
+    WHERE account = ?
+    ORDER BY level DESC`
+    ;
+    const [rows] = await charactersPool.execute(sql,[accountId]);
+    return rows;
+}
+
+module.exports = { 
+    getMainCharacterByAccountId
+    ,getAllCharactersByAccountId 
+};
