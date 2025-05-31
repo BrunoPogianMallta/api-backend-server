@@ -36,7 +36,7 @@ async function getVoteStatus(req, res) {
 
 // UTC -> horário de Brasília
 function toBrasiliaTime(date) {
-  return new Date(date.getTime() - 3 * 60 * 60 * 1000);
+  return new Date(date.getTime() + 3 * 60 * 60 * 1000);
 }
 
 async function registerVote(req, res) {
