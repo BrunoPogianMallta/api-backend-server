@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const characterRoutes = require('./routes/character.routes');
 const accountRoutes = require('./routes/account.routes');
+const voteRoutes = require('./routes/vote.routes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/characters', characterRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/dashboard', voteRoutes);
 
 
 module.exports = app;
