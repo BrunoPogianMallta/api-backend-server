@@ -1,6 +1,6 @@
 const authDb = require('../config/db'); // auth_core
 const charDb = require('../config/db.characters');
-const worldDb = require('../config/db.world');
+
 
 async function getUserDashboardProfile(accountId) {
   // 1. Buscar usuário

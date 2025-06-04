@@ -20,6 +20,7 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1",
+    "pg": "^8.16.0",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
