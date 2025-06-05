@@ -9,23 +9,24 @@ async function getUserDashboardProfile(accountId) {
   `, [accountId]);
 
   const user = userRows[0];
-  if (!user) throw new Error('Usuário não encontrado');
+  if (!user) {
+    // Retornar null ou objeto vazio para o frontend tratar
+    return null;
+  }
 
-  // 2. Buscar personagem principal
+  // resto do código mantém igual...
   const [charRows] = await charDb.execute(`
     SELECT name, class, level, totaltime FROM characters WHERE account = ? ORDER BY level DESC LIMIT 1
   `, [accountId]);
 
   const character = charRows[0];
 
-  // 3. Buscar pontos de voto
   const [voteRows] = await authDb.execute(`
     SELECT points FROM vote_points WHERE account_id = ?
   `, [accountId]);
 
   const votePoints = voteRows[0]?.points || 0;
 
-  // 4. Ranking (exemplo simplificado)
   const [rankingRows] = await charDb.execute(`
     SELECT account, MAX(level) as level FROM characters GROUP BY account ORDER BY level DESC
   `);
@@ -34,7 +35,7 @@ async function getUserDashboardProfile(accountId) {
 
   return {
     username: user.username,
-    avatarUrl: '/images/003.png', // pode vir da classe no futuro
+    avatarUrl: '/images/logomallta.png',
     class: getClassName(character?.class),
     level: character?.level || 0,
     votePoints,

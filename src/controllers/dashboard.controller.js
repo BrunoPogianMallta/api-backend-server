@@ -4,7 +4,7 @@ const characterService = require('../services/character.service');
 
 async function getProfile(req, res) {
   try {
-    const userId = req.user.id; // Vem do JWT token
+    const userId = req.user.id;
 
     // Buscar conta no banco auth_core
     const account = await accountService.getAccountFullById(userId);
@@ -14,23 +14,22 @@ async function getProfile(req, res) {
 
     // Buscar personagem principal (maior nível)
     const mainCharacter = await characterService.getMainCharacterByAccountId(userId);
-    if (!mainCharacter) {
-      return res.status(404).json({ success: false, message: 'Nenhum personagem encontrado' });
-    }
 
-    // Montar caminho do avatar (ajuste conforme imagens que você tiver)
-    const avatarUrl = `/images/avatars/${mainCharacter.race}_${mainCharacter.class}.jpg`;
+    // Avatar default se não houver personagem
+    const avatarUrl = mainCharacter
+      ? `/images/avatars/${mainCharacter.race}_${mainCharacter.class}.jpg`
+      : '/images/avatars/default.png'; // ou qualquer imagem default
 
     // Construir a resposta para o front-end
     const profileData = {
       username: account.username,
       avatarUrl,
-      class: getClassName(mainCharacter.class),
-      level: mainCharacter.level,
+      class: mainCharacter ? getClassName(mainCharacter.class) : 'Nenhuma classe',
+      level: mainCharacter ? mainCharacter.level : 0,
       votePoints: account.vote_points || 0,
       joinDate: formatDate(account.joindate),
-      ranking: 0, // futuramente você implementa essa lógica
-      hoursPlayed: Math.floor((account.totaltime || 0) / 3600)
+      ranking: 0, // Pode deixar 0 ou null até implementar
+      hoursPlayed: Math.floor((mainCharacter?.totaltime || 0) / 3600)
     };
 
     return res.json({ success: true, data: profileData });
