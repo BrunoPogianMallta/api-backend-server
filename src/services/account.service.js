@@ -37,10 +37,15 @@ async function updatePasswordSRP(username, verifier, salt) {
 }
 
 // Busca uma conta por nome de usuário
+// async function getAccountByUsername(username) {
+//   const sql = `SELECT id, username FROM account WHERE username = ?`;
+//   const [rows] = await pool.execute(sql, [username]);
+//   return rows[0];
+// }
+
 async function getAccountByUsername(username) {
-  const sql = `SELECT id, username FROM account WHERE username = ?`;
-  const [rows] = await pool.execute(sql, [username]);
-  return rows[0];
+  const [rows] = await pool.query('SELECT id, username, salt, verifier FROM account WHERE username = ?', [username]);
+  return rows[0]; // retorna o objeto do usuário
 }
 
 // Busca uma conta por ID
