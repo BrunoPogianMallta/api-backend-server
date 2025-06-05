@@ -48,28 +48,49 @@ async function registerVote(req, res) {
       return res.status(400).json({ message: 'Site ID é obrigatório' });
     }
 
+    // Busca todos os status de votos do usuário
     const status = await voteService.getVoteStatus(accountId);
+
+    // Verifica se ele já votou nesse site
     const siteStatus = status.find(s => s.site_id === site_id);
 
     const now = new Date();
+
+    // Se o usuário já votou e ainda está no cooldown
     if (siteStatus?.next_vote_time && new Date(siteStatus.next_vote_time) > now) {
-      return res.status(400).json({ message: 'Ainda não pode votar neste site' });
+      return res.status(400).json({ 
+        message: 'Ainda não pode votar neste site',
+        nextVoteTime: new Date(siteStatus.next_vote_time).toISOString()
+      });
     }
 
+    // Pega o cooldown do site (ex: 12 horas)
     const siteInfo = voteSites.find(s => s.site_id === site_id);
     const cooldownHours = siteInfo?.cooldownHours ?? 12;
 
+    // Define o próximo horário que poderá votar
     const nextVoteUTC = new Date(now.getTime() + cooldownHours * 60 * 60 * 1000);
     const nextVoteBrasilia = toBrasiliaTime(nextVoteUTC);
-
     const nextVoteTimeMySQL = nextVoteBrasilia.toISOString().slice(0, 19).replace('T', ' ');
 
+    // Atualiza o status de voto
     await voteService.updateVoteStatus(accountId, site_id, nextVoteTimeMySQL);
+
+    // Dá os pontos
     await voteService.addVotePoints(accountId, 10);
 
-    res.json({ message: 'Voto registrado com sucesso', nextVoteTime: nextVoteBrasilia.toISOString() });
+    res.json({
+      message: 'Voto registrado com sucesso',
+      nextVoteTime: nextVoteBrasilia.toISOString()
+    });
+
   } catch (error) {
-    console.error(error);
+    console.error('[ERRO AO REGISTRAR VOTO]', error);
+
+    if (error.code === 'ECONNRESET') {
+      return res.status(503).json({ message: 'Problema na conexão com o banco de dados' });
+    }
+
     res.status(500).json({ message: 'Erro ao registrar voto' });
   }
 }

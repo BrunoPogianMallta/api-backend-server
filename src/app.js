@@ -17,7 +17,7 @@ app.use(corsMiddleware);
 app.options('*', corsMiddleware); 
 
 app.use(helmet());               
-app.use(rateLimitMiddleware);
+// app.use(rateLimitMiddleware);
 app.use(express.json());
 
 // Suas rotas
