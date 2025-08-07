@@ -1,5 +1,5 @@
 const paymentService = require('../services/paymentService');
-const mailService = require('../services/mailService');
+const mailService = require('../services/MailService');
 
 async function iniciarPagamento(req, res) {
   console.log("\n[Payment] Nova requisição de pagamento recebida");
