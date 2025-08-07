@@ -1,6 +1,5 @@
 const accountService = require('../services/account.service');
 const characterService = require('../services/character.service');
-// const voteService = require('../services/vote.service'); // se ainda for usar no futuro
 
 async function getProfile(req, res) {
   try {
@@ -18,7 +17,7 @@ async function getProfile(req, res) {
     // Avatar default se não houver personagem
     const avatarUrl = mainCharacter
       ? `/images/avatars/${mainCharacter.race}_${mainCharacter.class}.jpg`
-      : '/images/avatars/default.png'; // ou qualquer imagem default
+      : '/images/avatars/default.png';
 
     // Construir a resposta para o front-end
     const profileData = {
@@ -29,7 +28,7 @@ async function getProfile(req, res) {
       votePoints: account.vote_points || 0,
       joinDate: formatDate(account.joindate),
       ranking: 0, // Pode deixar 0 ou null até implementar
-      hoursPlayed: Math.floor((mainCharacter?.totaltime || 0) / 3600)
+      hoursPlayed: Math.floor((mainCharacter?.totaltime || 0) / 3600),
     };
 
     return res.json({ success: true, data: profileData });

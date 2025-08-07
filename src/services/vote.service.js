@@ -1,5 +1,8 @@
-const authDb = require('../config/db'); 
+const authDb = require('../config/db');
 
+// ==============================================
+// ✅ Funções para usuários logados (JWT)
+// ==============================================
 async function getVoteStatus(accountId) {
   const [rows] = await authDb.execute(`
     SELECT site_id, next_vote_time
@@ -23,7 +26,6 @@ async function getVotePoints(accountId) {
     FROM account
     WHERE id = ?
   `, [accountId]);
-
   return rows[0]?.vote_points || 0;
 }
 
@@ -35,9 +37,42 @@ async function addVotePoints(accountId, pointsToAdd) {
   `, [pointsToAdd, accountId]);
 }
 
+// ==============================================
+// ✅ Funções para Postback (Top100Arena)
+// ==============================================
+async function getVoteStatusByPostback(postbackId, siteId) {
+  const [rows] = await authDb.execute(`
+    SELECT next_vote_time
+    FROM vote_status
+    WHERE postback_id = ? AND site_id = ?
+  `, [postbackId, siteId]);
+  return rows;
+}
+
+async function updateVoteStatusByPostback(postbackId, siteId, nextVoteTime) {
+  await authDb.execute(`
+    INSERT INTO vote_status (postback_id, site_id, next_vote_time)
+    VALUES (?, ?, ?)
+    ON DUPLICATE KEY UPDATE next_vote_time = VALUES(next_vote_time)
+  `, [postbackId, siteId, nextVoteTime]);
+}
+
+async function logPostback(postbackId, ip, siteId) {
+  await authDb.execute(`
+    INSERT INTO postback_logs (postback_id, ip, site_id, received_at)
+    VALUES (?, ?, ?, NOW())
+  `, [postbackId, ip, siteId]);
+}
+
 module.exports = {
+  // Usuários logados
   getVoteStatus,
   updateVoteStatus,
   getVotePoints,
-  addVotePoints
+  addVotePoints,
+
+  // Postback
+  getVoteStatusByPostback,
+  updateVoteStatusByPostback,
+  logPostback
 };
