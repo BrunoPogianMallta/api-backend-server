@@ -3,6 +3,7 @@ const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 const rateLimit = require('express-rate-limit');
 
+
 // Limitar a 10 requisições por minuto por IP
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minuto

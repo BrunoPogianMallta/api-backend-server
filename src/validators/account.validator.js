@@ -5,8 +5,8 @@ const updateEmailSchema = Joi.object({
 });
 
 const updatePasswordSchema = Joi.object({
-  verifier: Joi.string().required(),
-  salt: Joi.string().required()
+  currentPassword: Joi.string().required().min(6),
+  newPassword: Joi.string().required().min(6)
 });
 
 module.exports = {

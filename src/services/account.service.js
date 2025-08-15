@@ -26,10 +26,10 @@ async function updateEmail(userId, newEmail) {
 }
 
 // Atualiza apenas a senha (verifier + salt)
-async function updatePasswordSRP(username, verifier, salt) {
+async function updatePasswordSRP(username, { verifier, salt }) {
   const sql = `
     UPDATE account
-    SET v = ?, salt = ?
+    SET verifier = ?, salt = ?
     WHERE username = ?
   `;
   const [result] = await pool.execute(sql, [verifier, salt, username]);
@@ -65,6 +65,7 @@ async function getAccountFullById(id) {
   const [rows] = await pool.execute(sql, [id]);
   return rows[0];
 }
+
 
 module.exports = {
   createAccount,
